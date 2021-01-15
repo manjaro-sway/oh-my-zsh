@@ -2,7 +2,7 @@ name: bootstrap
 on: 
   workflow_dispatch:
   schedule:
-    - cron:  '0 2 * * *'
+    - cron:  '0 1-23/2 * * *'
 
 jobs:
   botstrap_actions:

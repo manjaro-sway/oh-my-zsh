@@ -46,6 +46,7 @@ jobs:
           prerelease: false
       -
         name: pkgbuild_x86_64
+        if: pkgbuild_x86_64
         if: ${{ env.X86_64 == 'true' }}
         run: |
           exec 1>>log 2> >(tee -a x86_64.${REPO_NAME}.$(date +%s).log >&2)
@@ -75,6 +76,7 @@ jobs:
           client-payload: '{ "repository": "${{ github.repository }}", "version": "${{ env.VERSION }}", "file_name": "${{ env.FILE_NAME_X86_64 }}"}'
       -
         name: pkgbuild_aarch64
+        id: pkgbuild_aarch64
         if: ${{ env.AARCH64 == 'true' }}
         run: |
           exec 1>>log 2> >(tee -a x86_64.${REPO_NAME}.$(date +%s).log >&2)
@@ -109,3 +111,17 @@ jobs:
         with:
           name: logs
           path: ./*.log
+      - name: Dump steps context
+        if: ${{ failure() }}
+        env:
+          STEPS_CONTEXT: ${{ toJson(steps) }}
+        run: echo "$STEPS_CONTEXT"
+      - 
+        name: delete release if pkgbuild failed
+        if: ${{ failure() }}
+        uses: dev-drprasad/delete-tag-and-release@v0.1.2
+        with:
+          delete_release: true
+          tag_name: ${{ env.VERSION && (steps.pkgbuild_aarch64.outcome  != 'success' || steps.pkgbuild_x86_64.outcome != 'success')}}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

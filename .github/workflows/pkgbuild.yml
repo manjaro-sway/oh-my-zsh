@@ -92,7 +92,8 @@ jobs:
               done
             fi
             sed -i '/^\[core\]/i \[manjaro-sway\]\nSigLevel = Optional TrustAll\nServer = https://packages.manjaro-sway.download/$arch\n' /etc/pacman.conf
-            pacman -Sy
+            pacman-mirrors --geoip
+            pacman -Syy
           run: |
             chown builder $PWD
             sudo -u builder makepkg -fsAc --noconfirm --noprogressbar

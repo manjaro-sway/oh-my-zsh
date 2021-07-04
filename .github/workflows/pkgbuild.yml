@@ -13,7 +13,7 @@ jobs:
     name: prepare
     steps:
       - 
-        uses: actions/checkout@v2
+        uses: actions/checkout@v2.3.4
       - 
         name: check-updatable
         id: check
@@ -28,7 +28,7 @@ jobs:
       - 
         name: create_release
         id: release
-        uses: actions/create-release@v1
+        uses: actions/create-release@v1.1.4
         if: ${{ steps.check.outputs.updatable == 'true' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -58,7 +58,7 @@ jobs:
             archlinux_arch: x86_64
     steps:
       - 
-        uses: actions/checkout@v2
+        uses: actions/checkout@v2.3.4
       -
         name: get-additional-gpg
         run: echo "ADDITIONAL_GPG=$(cat .github/additional_gpg)" >>$GITHUB_ENV
@@ -105,7 +105,7 @@ jobs:
       - 
         name: release
         if: ${{ env.BUILD == 'true' }}
-        uses: actions/upload-release-asset@v1
+        uses: actions/upload-release-asset@v1.0.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:

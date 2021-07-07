@@ -6,8 +6,8 @@
 # Contributor: ThinCarrotShrimp <christoph.r.martin+arch at gmail dot com>
 
 pkgname=oh-my-zsh
-pkgver=r5620.31eca46ee
-pkgrel=2
+pkgver=r6072.c44b99e90
+pkgrel=1
 pkgdesc="A community-driven framework for managing your zsh configuration. Includes 180+ optional plugins and over 120 themes to spice up your morning, and an auto-update tool so that makes it easy to keep up with the latest updates from the community"
 arch=('any')
 url='https://github.com/ohmyzsh/ohmyzsh'

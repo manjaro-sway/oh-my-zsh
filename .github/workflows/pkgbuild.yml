@@ -1,4 +1,4 @@
-name: pkgbuild_next
+name: pkgbuild
 
 on:
   workflow_dispatch:
@@ -44,7 +44,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2.3.4
       - name: get-additional-gpg
-        run: echo "ADDITIONAL_GPG=$(cat .github/additional_gpg)" >>$GITHUB_ENV
+        run: |
+          echo ${{ secrets.GPG_KEYID }} >>.github/additional_gpg
+          echo "ADDITIONAL_GPG=$(cat .github/additional_gpg)" >>$GITHUB_ENV
       - name: any-build
         if: ${{ ( contains(needs.prepare.outputs.architectures, 'any') && matrix.archlinux_arch == 'x86_64' ) }}
         run: echo "BUILD=true" >>$GITHUB_ENV
@@ -66,12 +68,12 @@ jobs:
             --cap-add=SYS_ADMIN
           shell: /bin/sh
           install: |
-            if [ -n "${{ env.ADDITIONAL_GPG }}" ]; then
-              for key in "${{ env.ADDITIONAL_GPG }}"; do
-                sudo -u builder gpg --recv-key $key
-              done
-            fi
-            pacman-key --keyserver pgp.mit.edu --recv-keys ${{ secrets.GPG_KEYID }}
+            for key in "${{ env.ADDITIONAL_GPG }}";do
+              sudo -u builder gpg --keyserver keys.openpgp.org --recv-key $key
+            done
+            sudo -u builder gpg --keyserver keys.openpgp.org --recv-key ${{ secrets.GPG_KEYID }}
+            pacman-key --keyserver keys.openpgp.org --recv-keys ${{ secrets.GPG_KEYID }}
+
             sed -i '/^\[core\]/i \[manjaro-sway\]\nSigLevel = Optional TrustAll\nServer = https://packages.manjaro-sway.download/$arch\n' /etc/pacman.conf
             pacman-mirrors --geoip
             pacman -Syy

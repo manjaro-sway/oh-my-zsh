@@ -97,7 +97,7 @@ jobs:
             ./artifacts/${{ env.FILE_NAME }} ./artifacts/${{ env.FILE_NAME }}.sig
       - name: dispatch
         if: ${{ env.BUILD == 'true' }}
-        uses: peter-evans/repository-dispatch@v1
+        uses: peter-evans/repository-dispatch@v2
         with:
           token: ${{ secrets.DISPATCH }}
           repository: manjaro-sway/packages

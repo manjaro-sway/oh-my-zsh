@@ -19,3 +19,5 @@ jobs:
         uses: manjaro-contrib/action-rebase@main
         with:
           upstream: https://aur.archlinux.org/oh-my-zsh-git.git
+          dispatch-target: ${{ vars.PACKAGES_REPO }}
+          dispatch-token: ${{ secrets.DISPATCH_TOKEN }}

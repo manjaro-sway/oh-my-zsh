@@ -1,0 +1,55 @@
+name: rebase
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron:  '*/30 * * * *'
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  rebase:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: checkout
+        uses: actions/checkout@main
+      - run: yq '.repository.topics = "arch, package"' -i .github/settings.yml
+      - id: version
+        uses: manjaro-contrib/action-pkgbuild-info@main
+      - if: steps.version.outputs.x86_64 == 'true'
+        uses: mikefarah/yq@bc5b54cb1d1f720db16c9f75c5b45384d00e5cbf # v4.44.5
+        with:
+          cmd: yq '.repository.topics += ", x86-64"' -i .github/settings.yml
+      - if: steps.version.outputs.aarch64 == 'true'
+        uses: mikefarah/yq@bc5b54cb1d1f720db16c9f75c5b45384d00e5cbf # v4.44.5
+        with:
+          cmd: yq '.repository.topics += ", aarch64"' -i .github/settings.yml
+      - if: steps.version.outputs.any == 'true'
+        uses: mikefarah/yq@bc5b54cb1d1f720db16c9f75c5b45384d00e5cbf # v4.44.5
+        with:
+          cmd: yq '.repository.topics += ", any"' -i .github/settings.yml
+      - if: steps.version.outputs.python == 'true'
+        uses: mikefarah/yq@bc5b54cb1d1f720db16c9f75c5b45384d00e5cbf # v4.44.5
+        with:
+          cmd: yq '.repository.topics += ", python"' -i .github/settings.yml
+      - name: commit
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            git config user.name "Manjaro Bot"
+            git config user.email "info@jonas-strassel.de"
+            git add .github/settings.yml
+            git commit -m "chore(actions-rebase): update topics"
+            git push
+          fi
+      - name: rebase
+        uses: manjaro-contrib/action-rebase@main
+        with:
+          upstream: https://aur.archlinux.org/oh-my-zsh-git.git
+          dispatch-target: ${{ vars.PACKAGES_REPO }}
+          dispatch-token: ${{ secrets.DISPATCH_TOKEN }}
+      

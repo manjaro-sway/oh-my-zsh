@@ -1,0 +1,19 @@
+name: bootstrap
+on: 
+  workflow_dispatch:
+  schedule:
+    - cron:  '0 1-23/2 * * *'
+
+jobs:
+  bootstrap_actions:
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+      - name: checkout
+        uses: actions/checkout@main
+        with:
+          token: ${{ secrets.BOOTSTRAP_WORKFLOWS || github.token }}
+      - id: bootstrap
+        uses: manjaro-contrib/action-bootstrap-actions@main
+        with:
+          upstream: https://aur.archlinux.org/oh-my-zsh-git.git
